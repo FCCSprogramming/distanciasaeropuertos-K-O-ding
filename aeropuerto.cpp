@@ -10,7 +10,7 @@ void llenarMatriz(const int &n, double ** mat);
 void mostrarMatriz(const int &n, double ** mat);
 double calcularPromedio(const int &n, double ** mat);
 void mostrarAerMenorDistancia(const int &n, double ** mat);
-void liberarMatriz(const int &n, double ** mat);
+void liberarMatriz(const int &n, double ** &mat);
 
 #include<iostream>
 #include<ctime>
@@ -27,11 +27,13 @@ int main(){
 
     double **aer = crearMatrizDinamica(N);
     llenarMatriz(N, aer);
+
     cout<<"\nLa matriz de distancias es:"<<endl;
     mostrarMatriz(N, aer);
     
 
     double prom = calcularPromedio(N, aer);
+    cout<<"El promedio de todas las distancias es: "<<prom<<" km."<<endl;
 
 
     mostrarAerMenorDistancia(N, aer);
@@ -58,12 +60,16 @@ void llenarMatriz(const int &n, double ** mat){
     {
         for (int j = i; j < n; j++)
         {
+            // La distancia de un aeropuerto a si mismo es '0'
             if (i==j)
             {
                 mat[i][j] = 0;
             }else
             {
+                // Se llenan los elementos arriba de la diagonal
                 mat[i][j] = rand() % 1401 + 100;
+                // La matriz de distancias es simetrica, entonces el elemento [i][j] es igual 
+                //    al elemento [j][i] 
                 mat[j][i] = mat[i][j];
             }
         }
@@ -78,7 +84,7 @@ void mostrarMatriz(const int &n, double ** mat){
         }
         cout<<endl;
     }
-    
+    cout<<endl;
 }
 double calcularPromedio(const int &n, double ** mat){
     double suma = 0;
@@ -87,6 +93,7 @@ double calcularPromedio(const int &n, double ** mat){
     {
         for (int j = i; j < n; j++)
         {
+            // Se suman solo los elementos arriba de la diagonal, ya que la matriz es simetrica
             if (i!=j)
             {
                 suma += mat[i][j];
@@ -96,6 +103,7 @@ double calcularPromedio(const int &n, double ** mat){
         }
     }
 
+    // El numero de elementos arriba o abajo de la diagonal es '2n'
     return ( suma/(2*n) );
     
 }
@@ -112,8 +120,11 @@ void mostrarAerMenorDistancia(const int &n, double ** mat){
         {
             suma+=mat[i][j];
         }
+
+        // Se calcula el promedio ignorando el elemento '0'
         prom_actual = suma/(n-1);
 
+        // Si es el primer promedio o si el promedio actual es menor que 'min' 
         if (min == -1 || prom_actual < min)
         {
             min = prom_actual;
@@ -126,7 +137,10 @@ void mostrarAerMenorDistancia(const int &n, double ** mat){
     cout<<"La distancia promedio es: "<<min<<" km."<<endl;
     
 }
-void liberarMatriz(const int &n, double ** mat){
+
+//  Se pasa el puntero por referencia para poder modificarlo
+//  Si se pasa como 'double ** mat' no se modificara al hacer 'mat = nullptr'
+void liberarMatriz(const int &n, double ** &mat){
     for (int i = 0; i < n; i++)
     {
         delete[] mat[i];
